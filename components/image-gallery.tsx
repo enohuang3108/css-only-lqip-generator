@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
 import { LqipImage } from "@/components/lqip-image"
+import { useState } from "react"
 
 // Sample gallery images with pre-computed LQIP values
 const galleryImages = [
   {
     src: "https://images.unsplash.com/photo-1682687982501-1e58ab814714",
     alt: "Mountain landscape",
-    lqip: -524123,
+    lqip: 999999,
     width: 1200,
     height: 800,
   },
@@ -80,6 +80,7 @@ export function ImageGallery() {
           </div>
           <div className="p-4">
             <h3 className="font-medium text-gray-900">{image.alt}</h3>
+            <h3 className="font-medium text-gray-900">{image.lqip}</h3>
             <p className="text-sm text-gray-500 mt-1">{loadingState[image.src] ? "Loaded" : "Loading..."}</p>
           </div>
         </div>

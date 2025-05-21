@@ -2,11 +2,10 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { extractLqipColors } from "@/lib/lqip-utils"
 import { Loader2, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 
 interface LqipData {
   src: string
@@ -23,7 +22,7 @@ async function generateClientSideLqip(file: File): Promise<number> {
     const ctx = canvas.getContext("2d")
     if (!ctx) {
       // If we can't get a canvas context, return a default LQIP value
-      resolve(-524123)
+      resolve(999999)
       return
     }
 
@@ -85,7 +84,7 @@ async function generateClientSideLqip(file: File): Promise<number> {
 
     img.onerror = () => {
       // If we can't load the image, return a default LQIP value
-      resolve(-524123)
+      resolve(999999)
     }
 
     img.src = URL.createObjectURL(file)
@@ -93,7 +92,7 @@ async function generateClientSideLqip(file: File): Promise<number> {
 }
 
 export function LqipCssDemo() {
-  const [showOriginal, setShowOriginal] = useState(true)
+  const [placeholderActive, setPlaceholderActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -102,13 +101,29 @@ export function LqipCssDemo() {
   const defaultImage: LqipData = {
     src: "https://images.unsplash.com/photo-1682687982501-1e58ab814714",
     alt: "Mountain landscape",
-    lqip: -524123,
+    lqip: 999999,
     width: 1200,
     height: 800,
   }
 
   const [imageData, setImageData] = useState<LqipData>(defaultImage)
-  const lqipDetails = extractLqipColors(imageData.lqip)
+  // const lqipDetails = extractLqipColors(imageData.lqip)
+  const lqipDetails = {
+    l: 0,
+    a: 0,
+    b: 0,
+    cells: [0, 0, 0, 0, 0, 0],
+  }
+
+  useEffect(() => {
+    const currentSrc = imageData.src
+    // Only revoke if it's a blob URL and it's not the default image
+    if (currentSrc && currentSrc.startsWith("blob:") && currentSrc !== defaultImage.src) {
+      return () => {
+        URL.revokeObjectURL(currentSrc)
+      }
+    }
+  }, [imageData.src, defaultImage.src])
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return
@@ -117,37 +132,81 @@ export function LqipCssDemo() {
     setLoading(true)
     setError(null)
 
+    // Create an object URL for the file. This will be used for the image src.
+    // It needs to be cleaned up by the useEffect hook when imageData.src changes or component unmounts.
+    const objectUrl = URL.createObjectURL(file)
+
     try {
-      // Create object URL for preview
-      const objectUrl = URL.createObjectURL(file)
+      // Part 1: Get dimensions and client-side LQIP in parallel
+      const clientLqipPromise = generateClientSideLqip(file)
+      const dimensionsPromise = new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => {
+          resolve({ width: img.width, height: img.height })
+        }
+        img.onerror = () => {
+          // If image loading for dimensions fails, revoke the objectUrl immediately
+          // as it won't be set to imageData.src and thus not cleaned by useEffect.
+          URL.revokeObjectURL(objectUrl)
+          reject(new Error("Failed to load image to get dimensions"))
+        }
+        img.src = objectUrl
+      })
 
-      // Generate LQIP using client-side processing
-      const lqip = await generateClientSideLqip(file)
+      const [clientLqip, dimensions] = await Promise.all([clientLqipPromise, dimensionsPromise])
 
-      // Load the image to get dimensions
-      const img = new Image()
-      img.onload = () => {
-        // Update image data with the uploaded image and generated LQIP
-        setImageData({
-          src: objectUrl,
-          alt: file.name,
-          width: img.width,
-          height: img.height,
-          lqip: lqip,
-        })
+      // Update UI with client-side LQIP and dimensions first
+      // This will trigger the useEffect to potentially revoke the previous blob URL
+      setImageData({
+        src: objectUrl,
+        alt: file.name,
+        width: dimensions.width,
+        height: dimensions.height,
+        lqip: clientLqip,
+      })
 
-        setLoading(false)
+      // Part 2: Fetch server-side LQIP
+      const formData = new FormData()
+      formData.append("image", file)
+      const response = await fetch("/api/lqip", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`API request failed: ${response.status} ${errorText}`)
       }
 
-      img.onerror = () => {
-        setError("Failed to load image")
-        setLoading(false)
-      }
-
-      img.src = objectUrl
+      const serverData = await response.json()
+      setImageData((prevState) => {
+        // Ensure we are updating the state for the currently displayed image (objectUrl)
+        // This prevents race conditions if another file is uploaded quickly.
+        if (prevState.src === objectUrl) {
+          return {
+            ...prevState,
+            lqip: serverData.lqip, // Update with server LQIP
+          }
+        }
+        return prevState // Avoid updating state for a different image
+      })
     } catch (err) {
       console.error("Error in handleFileUpload:", err)
-      setError("Failed to process image")
+      let errorMessage = "Failed to process image"
+      if (err instanceof Error) {
+        errorMessage = err.message
+      }
+      setError(errorMessage)
+      // If an error occurred *before* setImageData with the new objectUrl was called
+      // (e.g., during dimension loading or client LQIP generation if it could fail early),
+      // and objectUrl was created, it needs to be revoked if not done by dimensionPromise.onerror.
+      // However, the current logic in dimensionPromise.onerror handles its specific objectUrl revocation.
+      // If clientLqipPromise were to fail and we hadn't called dimensionsPromise.onerror path,
+      // objectUrl might leak. For robustness, one might consider revoking objectUrl here if it hasn't been
+      // assigned to imageData.src yet and error is not from dimensionsPromise.
+      // But for simplicity, relying on useEffect for cleanup once src is set is generally sufficient.
+      // The primary leak path (dimension loading failure) is handled.
+    } finally {
       setLoading(false)
     }
   }
@@ -160,7 +219,31 @@ export function LqipCssDemo() {
       const input = document.createElement("input")
       input.type = "file"
       input.accept = "image/*"
-      input.onchange = (e) => handleFileUpload(e as React.ChangeEvent<HTMLInputElement>)
+      input.onchange = (event: Event) => {
+        const currentTarget = event.currentTarget as HTMLInputElement
+        if (currentTarget && currentTarget.files && currentTarget.files.length > 0) {
+          // Synthesize the parts of React.ChangeEvent that handleFileUpload uses.
+          const syntheticReactEvent = {
+            target: currentTarget,
+            currentTarget,
+             // React's events are pooled, these are simplified approximations
+            bubbles: true,
+            cancelable: false,
+            defaultPrevented: false,
+            eventPhase: 0,
+            isTrusted: event.isTrusted,
+            nativeEvent: event,
+            preventDefault: () => event.preventDefault(),
+            isDefaultPrevented: () => event.defaultPrevented,
+            stopPropagation: () => event.stopPropagation(),
+            isPropagationStopped: () => false, // Simplified
+            persist: () => {}, // React's persist function for events
+            timeStamp: event.timeStamp,
+            type: event.type,
+          } as React.ChangeEvent<HTMLInputElement>
+          handleFileUpload(syntheticReactEvent)
+        }
+      }
       input.click()
     }
   }
@@ -180,22 +263,23 @@ export function LqipCssDemo() {
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
               <div className="aspect-[3/2] relative rounded-lg overflow-hidden">
-                {showOriginal ? (
-                  <img
-                    src={imageData.src || "/placeholder.svg"}
-                    alt={imageData.alt}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className="w-full h-full lqip-css-only"
-                    style={{ "--lqip": imageData.lqip } as React.CSSProperties}
-                  />
-                )}
+                <div
+                  className="w-full h-full lqip-css-only absolute inset-0"
+                  style={
+                    placeholderActive
+                    ? ({ "--lqip": imageData.lqip } as React.CSSProperties)
+                    : {}
+                  }
+                />
+                <img
+                  src={imageData.src || "/placeholder.svg"}
+                  alt={imageData.alt}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="mt-4 flex justify-center gap-2">
-                <Button onClick={() => setShowOriginal(!showOriginal)} variant="outline">
-                  {showOriginal ? "Show Placeholder" : "Show Original"}
+                <Button onClick={() => setPlaceholderActive(!placeholderActive)} variant="outline">
+                  {placeholderActive ? "Show Original" : "Show Placeholder"}
                 </Button>
                 <Button onClick={handleUploadClick} variant="outline" disabled={loading}>
                   {loading ? (
@@ -307,18 +391,18 @@ export function LqipCssDemo() {
               <h3 className="text-lg font-medium mb-2">HTML Usage</h3>
               <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
                 {`<!-- Basic usage -->
-<img src="image.jpg" style="--lqip:-524123" class="lqip-css-only" />
+<img src="image.jpg" style="--lqip:999999" class="lqip-css-only" />
 
 <!-- With image loading -->
 <div class="relative">
   <!-- Placeholder (shown first) -->
-  <div style="--lqip:-524123" class="lqip-css-only absolute inset-0"></div>
-  
+  <div style="--lqip:999999" class="lqip-css-only absolute inset-0"></div>
+
   <!-- Actual image (fades in when loaded) -->
-  <img 
-    src="image.jpg" 
-    class="opacity-0 transition-opacity duration-500" 
-    onload="this.classList.remove('opacity-0'); this.previousElementSibling.classList.add('opacity-0')" 
+  <img
+    src="image.jpg"
+    class="opacity-0 transition-opacity duration-500"
+    onload="this.classList.remove('opacity-0'); this.previousElementSibling.classList.add('opacity-0')"
   />
 </div>`}
               </pre>

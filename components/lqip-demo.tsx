@@ -2,12 +2,12 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
 import { LqipImage } from "@/components/lqip-image"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { extractLqipColors } from "@/lib/lqip-utils"
+import { extractLqipColors } from "@/lib/lqip"
 import { Loader2, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 
 interface LqipData {
   src: string
@@ -24,7 +24,7 @@ async function generateClientSideLqip(file: File): Promise<number> {
     const ctx = canvas.getContext("2d")
     if (!ctx) {
       // If we can't get a canvas context, return a default LQIP value
-      resolve(-524123)
+      resolve(999999)
       return
     }
 
@@ -86,7 +86,7 @@ async function generateClientSideLqip(file: File): Promise<number> {
 
     img.onerror = () => {
       // If we can't load the image, return a default LQIP value
-      resolve(-524123)
+      resolve(999999)
     }
 
     img.src = URL.createObjectURL(file)
@@ -103,7 +103,7 @@ export function LqipDemo() {
   const defaultImage: LqipData = {
     src: "https://images.unsplash.com/photo-1682687982501-1e58ab814714",
     alt: "Mountain landscape",
-    lqip: -524123,
+    lqip: 999999,
     width: 1200,
     height: 800,
   }
@@ -297,7 +297,7 @@ export function LqipDemo() {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     /* Top row */
     linear-gradient(
       to right,

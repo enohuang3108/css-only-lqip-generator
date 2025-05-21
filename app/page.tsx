@@ -1,5 +1,4 @@
 import { ImageGallery } from "@/components/image-gallery"
-import { LqipDemo } from "@/components/lqip-demo"
 import { LqipCssDemo } from "@/components/lqip-css-demo"
 import { NextResponse } from "next/server"
 
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
       height: 800,
       opaque: true,
       dominantColor: { r: 100, g: 150, b: 200 },
-      lqip: -524123,
+      lqip: 999999,
       baseColor: { l: 0.5, a: 0.1, b: -0.2 },
       values: [0.5, 0.6, 0.7, 0.4, 0.3, 0.5],
     })
@@ -41,10 +40,10 @@ export default function Home() {
         </p>
 
         <div className="space-y-12">
-          <div>
+          {/* <div>
             <h2 className="text-2xl font-bold mb-6 text-gray-900">JavaScript LQIP Demo</h2>
             <LqipDemo />
-          </div>
+          </div> */}
 
           <div>
             <h2 className="text-2xl font-bold mb-6 text-gray-900">CSS-only LQIP Demo</h2>

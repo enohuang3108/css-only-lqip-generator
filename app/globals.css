@@ -102,141 +102,6 @@
   filter: blur(20px);
 }
 
-/* Top row cells */
-.lqip-placeholder::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* Top row */
-  background-image: linear-gradient(
-    to right,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c1)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      0% 0%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c1)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      33.33% 0%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c2)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      33.33% 0%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c2)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      66.66% 0%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c3)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      66.66% 0%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c3)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      100% 0%,
-    /* Bottom row */
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c4)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      0% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c4)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      33.33% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c5)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      33.33% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c5)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      66.66% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c6)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      66.66% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c6)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      100% 50%,
-    /* Fill bottom half */
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c4)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      0% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c4)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      0% 100%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c5)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      33.33% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c5)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      33.33% 100%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c6)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      66.66% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c6)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      66.66% 100%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c6)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      100% 50%,
-    oklch(
-        calc(var(--lqip-l) * (0.5 + var(--lqip-c6)))
-          calc(sqrt(var(--lqip-a) * var(--lqip-a) + var(--lqip-b) * var(--lqip-b)))
-          calc(atan2(var(--lqip-b), var(--lqip-a)))
-      )
-      100% 100%
-  );
-  background-size: 100% 100%;
-  filter: blur(20px);
-  z-index: 2;
-}
 
 /* CSS-only LQIP extraction */
 [style*="--lqip:"] {
@@ -264,7 +129,7 @@
 }
 
 /* CSS-only LQIP rendering */
-.lqip-css-only {
+[style*="--lqip:"] {
   background-image: radial-gradient(50% 75% at 16.67% 25%, var(--lqip-ca-clr), transparent),
     radial-gradient(50% 75% at 50% 25%, var(--lqip-cb-clr), transparent),
     radial-gradient(50% 75% at 83.33% 25%, var(--lqip-cc-clr), transparent),
@@ -273,4 +138,15 @@
     radial-gradient(50% 75% at 83.33% 75%, var(--lqip-cf-clr), transparent),
     linear-gradient(0deg, var(--lqip-base-clr), var(--lqip-base-clr));
   filter: blur(20px);
+  /* overflow: hidden; */
+  position: relative;
+}
+
+.lqip-container img {
+  position: absolute;
+  inset: 0;
+  /* width: 100%; */
+  /* height: 100%; */
+  /* object-fit: cover; */
+  /* z-index: 10; */
 }
