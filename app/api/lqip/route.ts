@@ -1,8 +1,19 @@
 import { analyzeImage } from '@/lib/lqip';
 import { NextRequest, NextResponse } from 'next/server';
 
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_SITE_ORIGIN;
+
 export async function POST(request: NextRequest) {
   try {
+    const origin = request.headers.get('origin');
+    const isAllowedOrigin =
+      origin === ALLOWED_ORIGIN ||
+      (origin && origin.startsWith('http://localhost'));
+
+    if (!isAllowedOrigin) {
+      return NextResponse.json({ error: 'Forbidden: Cross-origin request not allowed' }, { status: 403 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('image') as File;
 

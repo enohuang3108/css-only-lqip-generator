@@ -1,10 +1,7 @@
-'use server'
-
 import { rgbToOkLab } from '@/lib/color/convert';
 import { getPalette } from '@/lib/color/thief';
 import sharp from 'sharp';
 
-// 假設這些函數從原始腳本複製並適應 ES 模組
 function findOklabBits(targetL: number, targetA: number, targetB: number) {
   const targetChroma = Math.hypot(targetA, targetB);
   const scaledTargetA = scaleComponentForDiff(targetA, targetChroma);

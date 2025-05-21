@@ -131,9 +131,6 @@ importers:
       next:
         specifier: 15.2.4
         version: 15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      next-themes:
-        specifier: ^0.4.4
-        version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       optional:
         specifier: ^0.1.4
         version: 0.1.4
@@ -1672,12 +1669,6 @@ packages:
 
   ndarray@1.0.19:
     resolution: {integrity: sha512-B4JHA4vdyZU30ELBw3g7/p9bZupyew5a7tX1Y/gGeF2hafrPaQZhgrGQfsvgfYbgdFZjYwuEcnaobeM/WMW+HQ==}
-
-  next-themes@0.4.4:
-    resolution: {integrity: sha512-LDQ2qIOJF0VnuVrrMSMLrWGjRMkq+0mpgl6e0juCLqdJ+oo8Q84JRWT6Wh11VDQKkMMe+dVzDKLWs5n87T+PkQ==}
-    peerDependencies:
-      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
   next@15.2.4:
     resolution: {integrity: sha512-VwL+LAaPSxEkd3lU2xWbgEOtrM8oedmyhBqaVNmgKB+GvZlCy9rgaEc+y2on0wv+l0oSFqLtYD6dcC1eAedUaQ==}
@@ -3525,11 +3516,6 @@ snapshots:
     dependencies:
       iota-array: 1.0.0
       is-buffer: 1.1.6
-
-  next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
-    dependencies:
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
 
   next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
