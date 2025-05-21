@@ -3,6 +3,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    unoptimized: true,
+  },
   webpack: (config, { isServer }) => {
     // Important: return the modified config
     if (isServer) {

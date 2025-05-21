@@ -82,6 +82,8 @@
 
 .lqip-container img {
   transition: opacity 0.5s ease;
+  position: absolute;
+  inset: 0;
 }
 
 .lqip-placeholder {
@@ -111,11 +113,11 @@
   --lqip-cd: mod(round(down, calc((var(--lqip) + pow(2, 19)) / pow(2, 12))), 4);
   --lqip-ce: mod(round(down, calc((var(--lqip) + pow(2, 19)) / pow(2, 10))), 4);
   --lqip-cf: mod(round(down, calc((var(--lqip) + pow(2, 19)) / pow(2, 8))), 4);
+
   --lqip-ll: mod(round(down, calc((var(--lqip) + pow(2, 19)) / pow(2, 6))), 4);
   --lqip-aaa: mod(round(down, calc((var(--lqip) + pow(2, 19)) / pow(2, 3))), 8);
   --lqip-bbb: mod(calc(var(--lqip) + pow(2, 19)), 8);
 
-  /* Convert to colors */
   --lqip-ca-clr: hsl(0 0% calc(var(--lqip-ca) / 3 * 60% + 20%));
   --lqip-cb-clr: hsl(0 0% calc(var(--lqip-cb) / 3 * 60% + 20%));
   --lqip-cc-clr: hsl(0 0% calc(var(--lqip-cc) / 3 * 60% + 20%));
@@ -123,30 +125,22 @@
   --lqip-ce-clr: hsl(0 0% calc(var(--lqip-ce) / 3 * 60% + 20%));
   --lqip-cf-clr: hsl(0 0% calc(var(--lqip-cf) / 3 * 60% + 20%));
   --lqip-base-clr: oklab(
-    calc(var(--lqip-ll) / 3 * 0.6 + 0.2) calc(var(--lqip-aaa) / 8 * 0.7 - 0.35)
-      calc((var(--lqip-bbb) + 1) / 8 * 0.7 - 0.35)
+    calc(var(--lqip-ll) / 3 * 0.6 + 0.2)
+    calc(var(--lqip-aaa) / 8 * 0.7 - 0.35)
+    calc((var(--lqip-bbb) + 1) / 8 * 0.7 - 0.35)
   );
 }
 
 /* CSS-only LQIP rendering */
 [style*="--lqip:"] {
-  background-image: radial-gradient(50% 75% at 16.67% 25%, var(--lqip-ca-clr), transparent),
+  background-image:
+    radial-gradient(50% 75% at 16.67% 25%, var(--lqip-ca-clr), transparent),
     radial-gradient(50% 75% at 50% 25%, var(--lqip-cb-clr), transparent),
     radial-gradient(50% 75% at 83.33% 25%, var(--lqip-cc-clr), transparent),
     radial-gradient(50% 75% at 16.67% 75%, var(--lqip-cd-clr), transparent),
     radial-gradient(50% 75% at 50% 75%, var(--lqip-ce-clr), transparent),
     radial-gradient(50% 75% at 83.33% 75%, var(--lqip-cf-clr), transparent),
-    linear-gradient(0deg, var(--lqip-base-clr), var(--lqip-base-clr));
-  filter: blur(20px);
-  /* overflow: hidden; */
-  position: relative;
-}
-
-.lqip-container img {
-  position: absolute;
-  inset: 0;
-  /* width: 100%; */
-  /* height: 100%; */
-  /* object-fit: cover; */
-  /* z-index: 10; */
+    linear-gradient(0deg, var(--lqip-base-clr), var(--lqip-base-clr))
+    ;
+    position: relative;
 }

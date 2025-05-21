@@ -34,9 +34,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       lqip: result.opaque && 'lqip' in result ? result.lqip : null,
-      width: result.width,
-      height: result.height,
-      opaque: result.opaque,
+      all: result
     });
   } catch (error) {
     console.error('Error processing image:', error);

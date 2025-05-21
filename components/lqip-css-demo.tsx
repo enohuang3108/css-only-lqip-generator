@@ -101,7 +101,7 @@ export function LqipCssDemo() {
   const defaultImage: LqipData = {
     src: "https://images.unsplash.com/photo-1682687982501-1e58ab814714",
     alt: "Mountain landscape",
-    lqip: 999999,
+    lqip: 417136,
     width: 1200,
     height: 800,
   }
@@ -248,6 +248,18 @@ export function LqipCssDemo() {
     }
   }
 
+  const {ca, cb, cc, cd, ce, cf, ll, aaa, bbb} = {
+    ca: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 18)) % 4,
+    cb: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 16)) % 4,
+    cc: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 14)) % 4,
+    cd: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 12)) % 4,
+    ce: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 10)) % 4,
+    cf: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 8)) % 4,
+    ll: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 6)) % 4,
+    aaa: Math.floor((imageData.lqip + Math.pow(2, 19)) / Math.pow(2, 3)) % 8,
+    bbb: (imageData.lqip + Math.pow(2, 19)) % 8,
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <Tabs defaultValue="demo" className="w-full">
@@ -319,17 +331,44 @@ export function LqipCssDemo() {
                 <div className="mt-4">
                   <p className="font-medium mb-2">CSS Variables:</p>
                   <pre className="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs">
-                    {`--lqip-ca: ${Math.round(lqipDetails.cells[0] * 3)}
---lqip-cb: ${Math.round(lqipDetails.cells[1] * 3)}
---lqip-cc: ${Math.round(lqipDetails.cells[2] * 3)}
---lqip-cd: ${Math.round(lqipDetails.cells[3] * 3)}
---lqip-ce: ${Math.round(lqipDetails.cells[4] * 3)}
---lqip-cf: ${Math.round(lqipDetails.cells[5] * 3)}
---lqip-ll: ${Math.round(((lqipDetails.l - 0.2) / 0.6) * 3)}
---lqip-aaa: ${Math.round(((lqipDetails.a + 0.35) / 0.7) * 7)}
---lqip-bbb: ${Math.round(((lqipDetails.b + 0.35) / 0.7) * 7 - 1)}`}
+                    {`
+                    --lqip-ca: ${ca};
+                    --lqip-cb: ${cb};
+                    --lqip-cc: ${cc};
+                    --lqip-cd: ${cd};
+                    --lqip-ce: ${ce};
+                    --lqip-cf: ${cf};
+
+                    --lqip-ll: ${ll};
+                    --lqip-aaa: ${aaa};
+                    --lqip-bbb: ${bbb};`}
                   </pre>
                 </div>
+                <div className="flex-1">
+              <h3 className="text-lg font-medium mb-3">LQIP Details</h3>
+              <div className="space-y-2 text-sm">
+                <div className="mt-4">
+                  <p className="font-medium mb-2">Color Preview:</p>
+                  <div
+                    className="h-10 rounded-md"
+                    style={{
+                      backgroundColor: `oklab(${ll/3*0.6+0.2} ${aaa/8*0.7-0.35} ${bbb/8*0.7-0.35})`,
+                    }}
+                  />
+                </div>
+                <div className="mt-4">
+                  <p className="font-medium mb-2">Grid Preview:</p>
+                  <div className="grid grid-cols-3 grid-rows-2 gap-1 h-20">
+                    <div className="rounded-sm" style={{ backgroundColor: `hsl(0 0% ${ca/3*60+20}%)`}}/>
+                    <div className="rounded-sm" style={{ backgroundColor: `hsl(0 0% ${cb/3*60+20}%)`}}/>
+                    <div className="rounded-sm" style={{ backgroundColor: `hsl(0 0% ${cc/3*60+20}%)`}}/>
+                    <div className="rounded-sm" style={{ backgroundColor: `hsl(0 0% ${cd/3*60+20}%)`}}/>
+                    <div className="rounded-sm" style={{ backgroundColor: `hsl(0 0% ${ce/3*60+20}%)`}}/>
+                    <div className="rounded-sm" style={{ backgroundColor: `hsl(0 0% ${cf/3*60+20}%)`}}/>
+                  </div>
+                </div>
+              </div>
+            </div>
                 <div className="mt-4">
                   <p className="font-medium mb-2">HTML Usage:</p>
                   <pre className="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs">
