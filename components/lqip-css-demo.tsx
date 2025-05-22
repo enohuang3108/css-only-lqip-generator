@@ -174,17 +174,13 @@ export function LqipDemo() {
             </div>
 
             <div className="flex-1">
-              <h3 className="text-lg font-medium mb-3">LQIP Details</h3>
+              <h3 className="text-lg font-medium mb-3">LQIP Hash: {imageData.lqip}</h3>
               <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium">LQIP Hash:</span>{" "}
-                  {imageData.lqip}
-                </p>
                 <div className="flex-1">
                   <h3 className="text-lg font-medium mb-3">LQIP Details</h3>
                   <div className="space-y-2 text-sm">
                     <div className="mt-4">
-                      <p className="font-medium mb-2">Color Preview:</p>
+                      <p className="font-medium mb-2">Base Color:</p>
                       <div
                         className="h-10 rounded-md"
                         style={{
@@ -195,7 +191,7 @@ export function LqipDemo() {
                       />
                     </div>
                     <div className="mt-4">
-                      <p className="font-medium mb-2">Grid Preview:</p>
+                      <p className="font-medium mb-2">3x2 Grid:</p>
                       <div className="grid grid-cols-3 grid-rows-2 gap-1 h-20">
                         <div
                           className="rounded-sm"

@@ -9,14 +9,15 @@ export default function Home() {
           CSS-Only LQIP Generator
         </h1>
         <p className="text-gray-600 mb-8 max-w-3xl">
-          This tool is implemented based on Lean{" "}
-          <a className="text-blue-500" href="https://github.com/Kalabasa">
-            Rada
+          This tool is implemented based on{" "}
+          <a className="text-blue-500" target="_blank" href="https://github.com/Kalabasa">
+            Lean Rada
           </a>
           ’s article on{" "}
           <a
             className="text-blue-500"
-            href="https://www.leanran.com/notes/css-only-lqip"
+            target="_blank"
+            href="https://leanrada.com/notes/css-only-lqip/"
           >
             CSS-only LQIP
           </a>
@@ -24,6 +25,16 @@ export default function Home() {
           You can convert images into LQIP hashes and embed them into any
           webpage—no JavaScript or React required—for fast, lightweight image
           previews.
+          <br /><br />
+          Check out the source code on{" "}
+          <a
+            className="text-blue-500"
+            target="_blank"
+            href="https://github.com/enohuang3108/css-only-lqip-generator"
+          >
+            GitHub
+          </a>
+          .
         </p>
 
         <div className="space-y-12">
