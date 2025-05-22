@@ -1,32 +1,38 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import Image from "next/image"
+import Image from "next/image";
 
 interface LqipImageProps {
-  src: string
-  lqip: number
-  width: number
-  height: number
-  onLoad?: () => void
-  isLoaded?: boolean
-  className?: string
+  src: string;
+  lqip: number;
+  width: number;
+  height: number;
+  onLoad?: () => void;
+  isLoaded?: boolean;
+  className?: string;
 }
 
-export function LqipImage({ src, lqip, width, height, onLoad, isLoaded = false, className = "" }: LqipImageProps) {
-
-  const lqipStyle = { "--lqip": lqip } as React.CSSProperties
-
+export function LqipImage({
+  src,
+  lqip,
+  width,
+  height,
+  onLoad,
+  isLoaded = false,
+  className = "",
+}: LqipImageProps) {
+  const lqipStyle = { "--lqip": lqip } as React.CSSProperties;
 
   const handleLoad = () => {
-    onLoad?.()
-  }
+    onLoad?.();
+  };
 
   return (
     <div className="lqip-container relative w-full h-full">
       <Image
-        src={src || "/placeholder.svg"}
+        src={src}
         alt=""
         width={width}
         height={height}
@@ -35,5 +41,5 @@ export function LqipImage({ src, lqip, width, height, onLoad, isLoaded = false, 
         style={lqipStyle}
       />
     </div>
-  )
+  );
 }

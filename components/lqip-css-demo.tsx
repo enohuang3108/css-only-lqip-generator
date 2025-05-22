@@ -5,7 +5,8 @@ import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Upload } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useRef, useState } from "react";
 import { CssImplementation } from "./css-implementation";
 
 interface LqipData {
@@ -15,89 +16,12 @@ interface LqipData {
   height: number;
 }
 
-// Client-side LQIP generation
-async function generateClientSideLqip(file: File): Promise<number> {
-  return new Promise((resolve) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      // If we can't get a canvas context, return a default LQIP value
-      resolve(999999);
-      return;
-    }
-
-    const img = new Image();
-    img.onload = () => {
-      // Resize to 3x2 grid
-      canvas.width = 3;
-      canvas.height = 2;
-      ctx.drawImage(img, 0, 0, 3, 2);
-
-      // Get pixel data
-      const imageData = ctx.getImageData(0, 0, 3, 2);
-      const data = imageData.data;
-
-      // Calculate average color
-      let r = 0,
-        g = 0,
-        b = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        r += data[i];
-        g += data[i + 1];
-        b += data[i + 2];
-      }
-      r = Math.round(r / (data.length / 4));
-      g = Math.round(g / (data.length / 4));
-      b = Math.round(b / (data.length / 4));
-
-      // Generate a simple LQIP value
-      const ll = Math.round(((r + g + b) / 765) * 3) & 0b11;
-      const aaa = Math.round((r / 255) * 7) & 0b111;
-      const bbb = Math.round((b / 255) * 7) & 0b111;
-
-      // Generate cell values
-      const cells = [];
-      for (let i = 0; i < 6; i++) {
-        const idx = i * 4;
-        const cellR = data[idx];
-        const cellG = data[idx + 1];
-        const cellB = data[idx + 2];
-        const brightness = (cellR + cellG + cellB) / 765;
-        cells.push(Math.round(brightness * 3) & 0b11);
-      }
-
-      // Pack into LQIP format
-      const lqip =
-        -(2 ** 19) +
-        ((cells[0] & 0b11) << 18) +
-        ((cells[1] & 0b11) << 16) +
-        ((cells[2] & 0b11) << 14) +
-        ((cells[3] & 0b11) << 12) +
-        ((cells[4] & 0b11) << 10) +
-        ((cells[5] & 0b11) << 8) +
-        ((ll & 0b11) << 6) +
-        ((aaa & 0b111) << 3) +
-        (bbb & 0b111);
-
-      resolve(lqip);
-    };
-
-    img.onerror = () => {
-      // If we can't load the image, return a default LQIP value
-      resolve(999999);
-    };
-
-    img.src = URL.createObjectURL(file);
-  });
-}
-
 export function LqipDemo() {
   const [placeholderActive, setPlaceholderActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Default example image with pre-computed LQIP value
   const defaultImage: LqipData = {
     src: "https://picsum.photos/seed/87/1200/800",
     lqip: 513379,
@@ -106,27 +30,6 @@ export function LqipDemo() {
   };
 
   const [imageData, setImageData] = useState<LqipData>(defaultImage);
-  // const lqipDetails = extractLqipColors(imageData.lqip)
-  const lqipDetails = {
-    l: 0,
-    a: 0,
-    b: 0,
-    cells: [0, 0, 0, 0, 0, 0],
-  };
-
-  useEffect(() => {
-    const currentSrc = imageData.src;
-    // Only revoke if it's a blob URL and it's not the default image
-    if (
-      currentSrc &&
-      currentSrc.startsWith("blob:") &&
-      currentSrc !== defaultImage.src
-    ) {
-      return () => {
-        URL.revokeObjectURL(currentSrc);
-      };
-    }
-  }, [imageData.src, defaultImage.src]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
@@ -135,44 +38,9 @@ export function LqipDemo() {
     setLoading(true);
     setError(null);
 
-    // Create an object URL for the file. This will be used for the image src.
-    // It needs to be cleaned up by the useEffect hook when imageData.src changes or component unmounts.
     const objectUrl = URL.createObjectURL(file);
 
     try {
-      // Part 1: Get dimensions and client-side LQIP in parallel
-      const clientLqipPromise = generateClientSideLqip(file);
-      const dimensionsPromise = new Promise<{ width: number; height: number }>(
-        (resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            resolve({ width: img.width, height: img.height });
-          };
-          img.onerror = () => {
-            // If image loading for dimensions fails, revoke the objectUrl immediately
-            // as it won't be set to imageData.src and thus not cleaned by useEffect.
-            URL.revokeObjectURL(objectUrl);
-            reject(new Error("Failed to load image to get dimensions"));
-          };
-          img.src = objectUrl;
-        }
-      );
-
-      const [clientLqip, dimensions] = await Promise.all([
-        clientLqipPromise,
-        dimensionsPromise,
-      ]);
-
-      // Update UI with client-side LQIP and dimensions first
-      // This will trigger the useEffect to potentially revoke the previous blob URL
-      setImageData({
-        src: objectUrl,
-        width: dimensions.width,
-        height: dimensions.height,
-        lqip: clientLqip,
-      });
-
-      // Part 2: Fetch server-side LQIP
       const formData = new FormData();
       formData.append("image", file);
       const response = await fetch("/api/lqip", {
@@ -187,15 +55,11 @@ export function LqipDemo() {
 
       const serverData = await response.json();
       setImageData((prevState) => {
-        // Ensure we are updating the state for the currently displayed image (objectUrl)
-        // This prevents race conditions if another file is uploaded quickly.
-        if (prevState.src === objectUrl) {
-          return {
-            ...prevState,
-            lqip: serverData.lqip, // Update with server LQIP
-          };
-        }
-        return prevState; // Avoid updating state for a different image
+        return {
+          ...prevState,
+          src: objectUrl,
+          lqip: serverData.lqip,
+        };
       });
     } catch (err) {
       console.error("Error in handleFileUpload:", err);
@@ -212,42 +76,24 @@ export function LqipDemo() {
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
-    } else {
-      // Fallback if the ref isn't working
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-      input.onchange = (event: Event) => {
-        const currentTarget = event.currentTarget as HTMLInputElement;
-        if (
-          currentTarget &&
-          currentTarget.files &&
-          currentTarget.files.length > 0
-        ) {
-          // Synthesize the parts of React.ChangeEvent that handleFileUpload uses.
-          const syntheticReactEvent = {
-            target: currentTarget,
-            currentTarget,
-            // React's events are pooled, these are simplified approximations
-            bubbles: true,
-            cancelable: false,
-            defaultPrevented: false,
-            eventPhase: 0,
-            isTrusted: event.isTrusted,
-            nativeEvent: event,
-            preventDefault: () => event.preventDefault(),
-            isDefaultPrevented: () => event.defaultPrevented,
-            stopPropagation: () => event.stopPropagation(),
-            isPropagationStopped: () => false, // Simplified
-            persist: () => {}, // React's persist function for events
-            timeStamp: event.timeStamp,
-            type: event.type,
-          } as React.ChangeEvent<HTMLInputElement>;
-          handleFileUpload(syntheticReactEvent);
-        }
-      };
-      input.click();
+      return;
     }
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e: Event) => {
+      const target = e.currentTarget as HTMLInputElement;
+      if (!target?.files?.length) return;
+
+      handleFileUpload({
+        target,
+        currentTarget: target,
+        preventDefault: () => e.preventDefault(),
+        stopPropagation: () => e.stopPropagation(),
+      } as React.ChangeEvent<HTMLInputElement>);
+    };
+    input.click();
   };
 
   const { ca, cb, cc, cd, ce, cf, ll, aaa, bbb } = {
@@ -277,12 +123,14 @@ export function LqipDemo() {
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
               <div className="aspect-[3/2] relative rounded-lg overflow-hidden">
-                <img
-                  src={imageData.src || "/placeholder.svg"}
+                <Image
+                  src={imageData.src}
                   alt=""
                   className={`w-full h-full object-cover ${
                     placeholderActive && "force-lqip"
                   }`}
+                  width={imageData.width}
+                  height={imageData.height}
                   style={{ "--lqip": imageData.lqip } as React.CSSProperties}
                 />
               </div>

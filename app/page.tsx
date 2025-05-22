@@ -6,10 +6,10 @@ export default function Home() {
     <main className="min-h-screen p-6 md:p-12 bg-gray-50">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900">
-          LQIP Generator
+          CSS-Only LQIP Generator
         </h1>
         <p className="text-gray-600 mb-8 max-w-3xl">
-          This tool is inspired by Lean{" "}
+          This tool is implemented based on Lean{" "}
           <a className="text-blue-500" href="https://github.com/Kalabasa">
             Rada
           </a>

@@ -1,30 +1,40 @@
-# LQIP image compression
+# CSS-only LQIP (Low-Quality Image Placeholder)
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+> This tool is implemented based on [Lean Rada’s article on CSS-only LQIP](https://leanrada.com/notes/css-only-lqip).
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/enohuang3108s-projects/v0-lqip-image-compression)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/928E8uqB5jc)
+A lightweight, JavaScript-free implementation of low-quality image placeholders (LQIP) using only CSS custom properties and gradients.
 
-## Overview
+This technique renders a soft, blurry image preview using a compact 20-bit integer — all handled natively by CSS, making it ideal for performance-critical applications or environments where JavaScript is restricted.
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## 🚀 Features
 
-## Deployment
+- ✅ Zero JavaScript
+- ⚡ Ultra-fast rendering using browser-native CSS
+- 🎨 Only 6 numbers needed for the placeholder
+- 🧠 Pure CSS logic: no runtime decoding needed
 
-Your project is live at:
+---
 
-**[https://vercel.com/enohuang3108s-projects/v0-lqip-image-compression](https://vercel.com/enohuang3108s-projects/v0-lqip-image-compression)**
+## 🛠 How It Works
 
-## Build your app
+1. **Bit Extraction**
+   A 20-bit integer is passed via a CSS custom property (`--lqip`). Bit fields are extracted using CSS `calc()` and simulated modular arithmetic (e.g., `mod`, `floor`) to decode the base color and per-cell brightness.
 
-Continue building your app on:
+2. **Color and Brightness Decoding**
 
-**[https://v0.dev/chat/projects/928E8uqB5jc](https://v0.dev/chat/projects/928E8uqB5jc)**
+   - The base color is encoded in the **Oklab** color space and converted to `rgb()` or `hsl()` for use as a background.
+   - Each of the 6 cells in the 3×2 grid has a 2-bit luminance value used to control the **opacity** (alpha) of a radial gradient, simulating brightness.
 
-## How It Works
+3. **Gradient Rendering**
+   A stack of 6 `radial-gradient` layers is rendered on top of the base color. Each gradient is precisely positioned to form one grid cell, with its alpha adjusted to approximate local brightness.
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+4. **Blur Simulation**
+   This implementation does **not** use `filter: blur()`. Instead, visual blur is simulated through soft-edged, overlapping radial gradients with smooth transparency transitions—resulting in a perceptually smooth appearance at zero runtime cost.
+
+---
+
+## 📦 Example Usage
+
+```html
+<img src="https://example.com/image.jpg" style="--lqip: 123456;" />
+```

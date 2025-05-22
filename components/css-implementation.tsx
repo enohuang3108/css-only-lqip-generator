@@ -1,21 +1,16 @@
+import { Copy } from "lucide-react";
+
 interface CssImplementationProps {
   lqip: number;
 }
 
 export const CssImplementation = ({ lqip }: CssImplementationProps) => {
-  return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-medium mb-2">HTML</h3>
-        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
-          {`<img src="image.jpg" style="--lqip:${lqip}"/>`}
-        </pre>
-      </div>
-      <div>
-        <h3 className="text-lg font-medium mb-2">CSS</h3>
-        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
-          {`
-[style*="--lqip:"] {
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text.trim());
+  };
+
+  const htmlCode = `<img src="image.jpg" style="--lqip:${lqip}"/>`;
+  const cssCode = `[style*="--lqip:"] {
   --lqip-ca: mod(round(down, calc((var(--lqip) + 524288) / 262144)), 4);
   --lqip-cb: mod(round(down, calc((var(--lqip) + 524288) / 65536)), 4);
   --lqip-cc: mod(round(down, calc((var(--lqip) + 524288) / 16384)), 4);
@@ -225,8 +220,39 @@ export const CssImplementation = ({ lqip }: CssImplementationProps) => {
       transparent
     ),
     linear-gradient(0deg, var(--lqip-base-clr), var(--lqip-base-clr));
-}
-`}
+}`;
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-lg font-medium">HTML</h3>
+          <button
+            onClick={() => copyToClipboard(htmlCode)}
+            className="px-2 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+          >
+            <Copy className="w-4 h-4" />
+          </button>
+        </div>
+        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+          {htmlCode}
+        </pre>
+      </div>
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-lg font-medium">CSS</h3>
+          <button
+            onClick={() => copyToClipboard(cssCode)}
+            className="px-2 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+          >
+            <Copy
+              className="w-4 h-4"
+              onClick={() => copyToClipboard(cssCode)}
+            />
+          </button>
+        </div>
+        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+          {cssCode}
         </pre>
       </div>
     </div>
